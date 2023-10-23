@@ -32,7 +32,7 @@ public class TestWork {
         driver = new ChromeDriver(options);
         driver.get("https://duckduckgo.com");
         driver.findElement(By.id("searchbox_input")).sendKeys("ОТУС", Keys.ENTER);
-        WebElement title = driver.findElement(By.cssSelector("a[href='https://otus.ru/']:first-child"));
+        WebElement title = driver.findElement(By.cssSelector("a[href$='https://otus.ru/']:first-child"));
         Assertions.assertEquals(title.getText(),
                 "Онлайн‑курсы для профессионалов, дистанционное обучение современным ...");
         log.info("Первый тест пройден");
