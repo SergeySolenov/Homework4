@@ -21,9 +21,9 @@ public class TestWork {
     }
     @AfterEach
     public void end() {
-        if (driver != null) {            
-            driver.quit();
+        if (driver != null) {   
             driver.close();
+            driver.quit();
         }
     }
 
