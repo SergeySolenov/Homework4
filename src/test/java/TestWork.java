@@ -1,19 +1,18 @@
+import factory.WebDriverFactory;
 import io.github.bonigarcia.wdm.WebDriverManager;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.assertj.core.api.AssertionsForClassTypes;
 import org.junit.jupiter.api.*;
-import org.openqa.selenium.By;
-import org.openqa.selenium.Keys;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.*;
+import org.openqa.selenium.interactions.Actions;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import waiters.Waiters;
 
 
 public class TestWork {
-    Logger log = LogManager.getLogger(TestWork.class);
-    WebDriver driver;
-    ChromeOptions options = new ChromeOptions();
+    private final Logger log = LogManager.getLogger(TestWork.class);
+    private WebDriver driver;
 
     @BeforeAll
     public static void setup() {
@@ -28,10 +27,13 @@ public class TestWork {
 
     @Test
     public void duckTest() {
-        options.addArguments("--headless");
-        driver = new ChromeDriver(options);
-        driver.get("https://duckduckgo.com");
+        driver = new WebDriverFactory().create("--headless");
+        driver.get("https://duckduckgo.com/");
         driver.findElement(By.id("searchbox_input")).sendKeys("ОТУС", Keys.ENTER);
+        AssertionsForClassTypes.assertThat(new Waiters(driver).waitAppearance(ExpectedConditions.presenceOfElementLocated(
+                        By.cssSelector("a[href='https://otus.ru/']:first-child"))))
+                .as("Отус первый в поиске")
+                .isTrue();
         WebElement title = driver.findElement(By.cssSelector("a[href='https://otus.ru/']:first-child"));
         Assertions.assertEquals(title.getText(),
                 "Онлайн‑курсы для профессионалов, дистанционное обучение современным ...");
@@ -39,11 +41,11 @@ public class TestWork {
     }
 
     @Test
-    public void picTest(){
-        options.addArguments("--start-fullscreen");
-        driver = new ChromeDriver(options);
-        driver.get("https://demo.w3layouts.com/demos_new/template_demo/03-10-2020/photoflash-liberty-demo_Free/685659620/web/index.html?_ga=2.181802926.889871791.1632394818-2083132868.1632394818");
-        driver.findElement(By.className("content-overlay")).click();
+    public void picTest() {
+        driver = new WebDriverFactory().create("--start-fullscreen");
+        driver.get("https://demo.w3layouts.com/demos_new/template_demo/03-10-2020/photoflash-liberty-demo_Free/685659620/web/index.html?_ga=2.181802926.889871791.1632394818-2083132868.1632394818/");
+        Actions act =  new Actions(driver);
+        act.moveToElement(driver.findElement(By.className("content-overlay"))).click().perform();
         WebElement pic = driver.findElement(By.className("pp_hoverContainer"));
         log.info("Второй тест, первая проверка пройдена");
         pic.isDisplayed();
@@ -52,16 +54,15 @@ public class TestWork {
 
     @Test
     public void otusTest() {
-        options.addArguments("--start-maximized");
-        driver = new ChromeDriver(options);
+        driver = new WebDriverFactory().create("--start-maximized");
         driver.get("https://otus.ru/");
         driver.findElement(By.className("sc-mrx253-0")).click();
         WebElement email = driver.findElement(By.name("email"));
-        email.clear();
-        email.sendKeys("coyoje2271@vinthao.com");
+        String js = "arguments[0].setAttribute('value','coyoje2271@vinthao.com')";
+        ((JavascriptExecutor) driver).executeScript(js, email);
         WebElement password = driver.findElement(By.cssSelector("input[type='password']"));
-        password.clear();
-        password.sendKeys("Sovet123!");
+        String js2 = "arguments[0].setAttribute('value','Sovet123!')";
+        ((JavascriptExecutor) driver).executeScript(js2, password);
         driver.findElement(By.className("gYNtqF")).click();
         log.info("Третий тест пройден");
         System.out.println(driver.manage().getCookies());
