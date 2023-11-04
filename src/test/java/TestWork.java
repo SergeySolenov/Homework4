@@ -2,12 +2,12 @@ import factory.WebDriverFactory;
 import io.github.bonigarcia.wdm.WebDriverManager;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.assertj.core.api.AssertionsForClassTypes;
 import org.junit.jupiter.api.*;
 import org.openqa.selenium.*;
 import org.openqa.selenium.interactions.Actions;
-import org.openqa.selenium.support.ui.ExpectedConditions;
-import waiters.Waiters;
+
+
+import java.time.Duration;
 
 
 public class TestWork {
@@ -28,12 +28,9 @@ public class TestWork {
     @Test
     public void duckTest() {
         driver = new WebDriverFactory().create("--headless");
+        driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(5));
         driver.get("https://duckduckgo.com/");
         driver.findElement(By.id("searchbox_input")).sendKeys("ОТУС", Keys.ENTER);
-        AssertionsForClassTypes.assertThat(new Waiters(driver).waitAppearance(ExpectedConditions.presenceOfElementLocated(
-                        By.cssSelector("a[href='https://otus.ru/']:first-child"))))
-                .as("Отус первый в поиске")
-                .isTrue();
         WebElement title = driver.findElement(By.cssSelector("a[href='https://otus.ru/']:first-child"));
         Assertions.assertEquals(title.getText(),
                 "Онлайн‑курсы для профессионалов, дистанционное обучение современным ...");
@@ -55,6 +52,7 @@ public class TestWork {
     @Test
     public void otusTest() {
         driver = new WebDriverFactory().create("--start-maximized");
+        driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(5));
         driver.get("https://otus.ru/");
         driver.findElement(By.className("sc-mrx253-0")).click();
         WebElement email = driver.findElement(By.name("email"));
